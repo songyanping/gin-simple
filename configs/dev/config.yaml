@@ -1,0 +1,3 @@
+server:
+  AppMode: debug
+  HttpPort: :8080
