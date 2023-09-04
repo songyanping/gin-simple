@@ -1,0 +1,41 @@
+
+
+第一步生成CA
+生成ca私钥
+openssl genrsa -out ca.key 2048
+
+通过ca私钥生成ca根证书
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 365 -out rootCA.crt
+根据提示输入对应信息：
+Country Name (2 letter code) [AU]:CH
+State or Province Name (full name) [Some-State]:GuangDong
+Locality Name (eg, city) []:GuangZhou
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:LianWei
+Organizational Unit Name (eg, section) []:SRE
+Common Name (e.g. server FQDN or YOUR name) []:www.lianwei.com
+Email Address []:601211150@qq.com
+
+
+第二步
+生成服务端私钥
+openssl genrsa -out server.key 2048
+生成服务端请求文件
+openssl req -new -key server.key -out server.csr
+根据提示输入对应信息：
+Country Name (2 letter code) [AU]:CH
+State or Province Name (full name) [Some-State]:GD
+Locality Name (eg, city) []:GZ
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:lianwei
+Organizational Unit Name (eg, section) []:sre
+Common Name (e.g. server FQDN or YOUR name) []:*.cx4.com
+Email Address []:601211150@qq.com
+
+第三步使用ca证书签名server.csr
+ openssl x509 -req -in server.csr -CA rootCA.crt -CAkey ca.key -CAcreateseri
+al -out server.crt -days 365
+
+
+
+第四步生成k8s secret
+
+kubectl create secret tls tls-secret --key server.key --cert server.crt
